@@ -42,7 +42,7 @@ export default function HomePage() {
     });
 
     const data: SEOResult = await res.json();
-    console.log("API Response:", data);  // Debugging log
+    console.log("API Response:", data); // Debugging log
 
     setResult(data);
     setLoading(false);
@@ -58,10 +58,19 @@ export default function HomePage() {
   return (
     <div className="relative">
       <Navbar />
-      <Hero/>
-      <div className="flex flex-col items-center p-10 space-y-6" id="main-section">
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1 }}>
-          <AntTitle level={2} className="mb-6 text-white">🚀 SEO Optimizer</AntTitle>
+      <Hero />
+      <div
+        className="flex flex-col items-center mt-20 p-10 space-y-6 h-screen"
+        id="main-section"
+      >
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1 }}
+        >
+          <AntTitle level={2} className="mb-6 text-white">
+            🚀 SEO Optimizer
+          </AntTitle>
         </motion.div>
 
         {step === 1 && (
@@ -72,7 +81,9 @@ export default function HomePage() {
             className="space-y-4"
           >
             <Space direction="vertical" className="mt-3">
-              <Text className="text-lg">🔎 Step 1: Enter your website URL to analyze its SEO.</Text>
+              <Text className="text-lg">
+                🔎 Step 1: Enter your website URL to analyze its SEO.
+              </Text>
               <Input
                 className="w-80"
                 placeholder="Enter website URL"
@@ -80,21 +91,29 @@ export default function HomePage() {
                 onChange={(e) => setUrl(e.target.value)}
               />
               <Button
-  type="default"
-  className="bg-white text-black hover:bg-gray-200 font-semibold px-6 py-3 rounded-lg"
-  onClick={analyzeSEO}
-  disabled={loading || !url}
->
-  {loading ? <Spin /> : "Analyze"}
-</Button>
+                type="default"
+                className="bg-white text-black hover:bg-gray-200 font-semibold px-6 py-3 rounded-lg"
+                onClick={analyzeSEO}
+                disabled={loading || !url}
+              >
+                {loading ? <Spin /> : "Analyze"}
+              </Button>
             </Space>
           </motion.div>
         )}
 
         {step === 2 && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5 }}
+          >
             <Text className="text-lg">
-              ⏳ Step 2: Analyzing SEO for <strong>{url.length > 15 ? url.slice(0, 15) + "..." : url}</strong>...
+              ⏳ Step 2: Analyzing SEO for{" "}
+              <strong>
+                {url.length > 15 ? url.slice(0, 15) + "..." : url}
+              </strong>
+              ...
             </Text>
             <Spin size="large" className="mt-3" />
           </motion.div>
@@ -115,36 +134,36 @@ export default function HomePage() {
                 <Title title={result.title} />
                 <MetaDescription metaDescription={result.metaDescription} />
                 <Headings headings={result.headings} />
-                                {/* ✅ New Components for Alt Texts and Keywords */}
-                                <AltTexts altTexts={result.altTexts} />
+                {/* ✅ New Components for Alt Texts and Keywords */}
+                <AltTexts altTexts={result.altTexts} />
                 <Keywords keywords={result.keywords} />
                 <AISuggestions suggestions={result.suggestions} />
                 <SEOChart score={result.seoScore} />
-
-
               </div>
 
               {/* AI-based Fixing */}
               <div className="mt-6 text-center flex flex-col">
-                <Text className="text-lg">🤖 Step 4: Let AI optimize your SEO for better rankings!</Text>
+                <Text className="text-lg">
+                  🤖 Step 4: Let AI optimize your SEO for better rankings!
+                </Text>
                 <Button
-  type="default"
-  className="bg-white text-black hover:bg-gray-200 font-semibold px-6 py-3 rounded-lg mt-3"
-  onClick={() => alert("AI will now suggest SEO fixes!")}
->
-  Optimize with AI
-</Button>
+                  type="default"
+                  className="bg-white text-black hover:bg-gray-200 font-semibold px-6 py-3 rounded-lg mt-3"
+                  onClick={() => alert("AI will now suggest SEO fixes!")}
+                >
+                  Optimize with AI
+                </Button>
               </div>
 
               {/* Check Another Website Button */}
               <div className="mt-6 text-center">
-              <Button
-  type="default"
-  className="bg-white text-black hover:bg-gray-200 font-semibold px-6 py-3 rounded-lg mt-3"
-  onClick={resetSEOCheck}
->
-  🔄 Check Another Website
-</Button>
+                <Button
+                  type="default"
+                  className="bg-white text-black hover:bg-gray-200 font-semibold px-6 py-3 rounded-lg mt-3"
+                  onClick={resetSEOCheck}
+                >
+                  🔄 Check Another Website
+                </Button>
               </div>
             </Card>
           </motion.div>

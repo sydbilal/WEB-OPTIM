@@ -9,7 +9,7 @@ const Hero: FC = () => {
       <motion.img
         src="/weboptim.png"
         alt="App Logo"
-        className="w-40 h-40 mb-6"
+        className="w-40 h-50 "
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.8 }}
