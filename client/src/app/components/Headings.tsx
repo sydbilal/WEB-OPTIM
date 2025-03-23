@@ -3,8 +3,13 @@ import { motion } from "framer-motion";
 
 const { Title, Text } = Typography;
 
+interface Heading {
+  tag: string;
+  text: string;
+}
+
 interface HeadingsProps {
-  headings: string[];
+  headings: Heading[];
 }
 
 export default function Headings({ headings }: HeadingsProps) {
@@ -15,7 +20,7 @@ export default function Headings({ headings }: HeadingsProps) {
       transition={{ duration: 0.5, ease: "easeOut" }}
     >
       <Card
-        title={<Title level={4}>📌 Headings</Title>}
+        title={<Title level={4}>📌 Extracted Headings</Title>}
         bordered={false}
         style={{
           background: "#f0f2f5",
@@ -28,7 +33,9 @@ export default function Headings({ headings }: HeadingsProps) {
             dataSource={headings}
             renderItem={(heading, index) => (
               <List.Item>
-                <Text strong>{index + 1}. {heading}</Text>
+                <Title level={getTitleLevel(heading.tag)}>
+                  {index + 1}. {heading.text}
+                </Title>
               </List.Item>
             )}
           />
@@ -38,4 +45,10 @@ export default function Headings({ headings }: HeadingsProps) {
       </Card>
     </motion.div>
   );
+}
+
+// Helper function to convert "H1", "H2", etc. to Ant Design Title levels
+function getTitleLevel(tag: string): 1 | 2 | 3 | 4 | 5 | 6 {
+  const level = parseInt(tag.replace("H", ""), 10);
+  return (level >= 1 && level <= 6 ? level : 5) as 1 | 2 | 3 | 4 | 5 | 6;
 }

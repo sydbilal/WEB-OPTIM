@@ -3,10 +3,7 @@ import { Request, Response } from "express";
 import { getAIRecommendations } from "../services/aiService";
 import { calculateSEOScore } from "../services/seoService";
 
-export const analyzeSEO = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+export const analyzeSEO = async (req: Request, res: Response): Promise<void> => {
   try {
     const { url } = req.body;
     console.log("Received URL:", url);
@@ -23,41 +20,69 @@ export const analyzeSEO = async (
     await page.goto(url, { waitUntil: "networkidle2" });
     console.log("Page loaded");
 
-    console.log("Final Page URL:", page.url()); // Debugging redirections
+    console.log("Final Page URL:", page.url());
 
     await new Promise((resolve) => setTimeout(resolve, 3000));
 
+    // Extract Title
     const title = await page.title();
+
+    // Extract Meta Description
     const metaDescription = await page.evaluate(() => {
       const metaTag = document.querySelector("meta[name='description']");
-      return metaTag?.getAttribute("content") ?? "Missing"; // Ensures it is always a string
+      return metaTag?.getAttribute("content") ?? "Missing";
     });
 
-    await page
-      .waitForSelector("h1, h2", { timeout: 5000 })
-      .catch(() => console.log("No headings found"));
-
+    // Extract All Headings (H1-H6)
     const headings = await page.evaluate(() =>
-      Array.from(document.querySelectorAll("h1, h2"))
-        .map((h) => h.textContent?.trim() || "")
-        .filter((text) => text.length > 0)
+      Array.from(document.querySelectorAll("h1, h2, h3, h4, h5, h6"))
+        .map((h) => ({
+          tag: h.tagName,
+          text: h.textContent?.trim() || "",
+        }))
+        .filter((h) => h.text.length > 0)
     );
 
     console.log("Extracted Headings:", headings);
 
+    // Extract Image Alt Texts
+    const imageAltTexts = await page.evaluate(() =>
+      Array.from(document.querySelectorAll("img"))
+        .map((img) => img.getAttribute("alt")?.trim() || "Missing Alt Text")
+        .filter((alt) => alt.length > 0)
+    );
+
+    console.log("Extracted Image Alt Texts:", imageAltTexts);
+
+    // Extract Keywords from Meta Keywords Tag
+    const metaKeywords = await page.evaluate(() => {
+      const metaTag = document.querySelector("meta[name='keywords']");
+      return metaTag?.getAttribute("content") ?? "No keywords found";
+    });
+
+    console.log("Extracted Keywords:", metaKeywords);
+
     await browser.close();
     console.log("Puppeteer closed");
 
-    // Ensure aiSuggestions is always a string
+    // AI SEO Suggestions
     const aiSuggestions =
-      (await getAIRecommendations(title, metaDescription, headings)) || "";
+  (await getAIRecommendations(
+    title, 
+    metaDescription, 
+    headings.map(h => h.text), 
+    imageAltTexts,  // Pass extracted alt texts
+    metaKeywords.split(",").map(k => k.trim()),  // Convert keywords to an array
+    [], // Internal links (Modify if needed)
+    []  // External links (Modify if needed)
+  )) || "";
 
     console.log("AI Suggestions generated");
 
     const seoScore = calculateSEOScore(
       title,
       metaDescription,
-      headings,
+      headings.map(h => h.text),
       aiSuggestions
     );
 
@@ -65,6 +90,8 @@ export const analyzeSEO = async (
       title,
       metaDescription,
       headings,
+      imageAltTexts,
+      keywords: metaKeywords,
       suggestions: aiSuggestions,
       seoScore,
     });
